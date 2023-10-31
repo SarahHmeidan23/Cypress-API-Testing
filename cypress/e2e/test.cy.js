@@ -1,5 +1,7 @@
 /// <reference types= "cypress" />
 describe("API Testing", () => {
+  const RandomISBN = Math.floor(Math.random() * 13330);
+  const RandomAISLE = Math.floor(Math.random() * 14440);
   const firstNames = [
     "Alice",
     "Bob",
@@ -24,17 +26,30 @@ describe("API Testing", () => {
     "Jackson",
     "Perez",
   ];
-  const RandomFullNames =
-    Math.floor(Math.random() * firstNames.length) +
-    Math.floor(Math.random() * lastNames.length);
-  const RandomISBN = Math.floor(Math.random() * 13330);
-  const RandomAISLE = Math.floor(Math.random() * 14440);
+  const RandomFirstNames = Math.floor(Math.random() * firstNames.length);
+  const RandomLastNames = Math.floor(Math.random() * lastNames.length);
+  const RandomAuthor = firstNames[RandomFirstNames] + " " + lastNames[RandomLastNames];
+  const bookNames = [
+    "Test-Driven Development in Practice",
+    "The QA Tester's Handbook",
+    "Quality Assurance Essentials",
+    "Testing for Success",
+    "Agile Testing Strategies",
+    "The Art of Software Testing",
+    "Quality Control in Action",
+    "Automated Testing Mastery",
+    "Testing Scenarios Unleashed",
+    "Bug Hunting Adventures",
+  ];
+
+  const RandomBookNames = Math.floor(Math.random() * bookNames.length);
+
   it("Test POST Method", () => {
     const requestBody = {
       name: "Qa private Zoom",
       isbn: RandomISBN,
       aisle: RandomAISLE,
-      author: RandomFullNames,
+      author: RandomAuthor,
     };
     cy.request({
       method: "POST",
@@ -47,25 +62,30 @@ describe("API Testing", () => {
       expect(Response.body.Msg).to.eq("successfully added");
     });
   });
-  it.skip("Test GET Method", () => {
+  it("Test GET Method", () => {
     cy.request({
       method: "GET",
       url: `https://rahulshettyacademy.com/Library//GetBook.php?ID=${RandomISBN}${RandomAISLE}`,
     }).then((Response) => {
       cy.log(Response.body[0].book_name);
+      cy.log(Response.body[0].author);
       expect(Response.status).to.eq(200);
-      expect(Response.body[0].author).to.eq(RandomFullNames);
+      expect(Response.body[0].author).to.eq(RandomAuthor);
     });
   });
-  it.skip("Test DELETE Method", () => {
-  
+  it("Test Delete Method", () => {
+    let RequestBody = {
+      ID: `${RandomISBN}${RandomAISLE}`,
+    };
     cy.request({
       method: "DELETE",
       url: "https://rahulshettyacademy.com/Library/DeleteBook.php",
-      body: { ID: RandomISBN + RandomAISLE }
-    }).then((Response)=>{
+      body: RequestBody,
+    }).then((Response) => {
+      cy.log(Response.status);
+      cy.log(Response.body);
       expect(Response.status).to.eq(200);
-      expect(Response.body.Msg).to.eq("book is successfully deleted")
-    })
+      expect(Response.body.msg).to.eq("book is successfully deleted");
+    });
   });
 });
